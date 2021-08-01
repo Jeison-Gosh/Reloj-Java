@@ -1,7 +1,15 @@
 package alarma;
 
+import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Image;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.logging.Level;
@@ -14,9 +22,12 @@ import javax.swing.SwingConstants;
 
 public class Componentes extends JFrame {
     
-    private JPanel ventana ;
-    private JLabel timerButton, alarmButton, clockButton, exitButton, minimizeButton;
     private Thread timer_thread , clock1_thread, clock2_thread;
+    private JPanel ventana ;
+    private JLabel timerButton, alarmButton, clockButton, exitButton, minimizeButton, backgroundButton;
+    private TrayIcon trayicon;
+    private MenuItem TI_tooltip_open, TI_tooltip_close;
+    private SystemTray systemtray;
     private Runnable timer_runnable, clock1_runnable, clock2_runnable;
     private boolean reloj_formato_estado, clock_default_color_buttons=true;
     private boolean timer_default_startstopbutton=true, timer_default_resetbutton=false, timer_default_image_status=true, timer_thread_is_not_start=true;
@@ -41,6 +52,8 @@ public class Componentes extends JFrame {
         PanelDeEntrada();
         BotonDeCierre();
         BotonDeMinimizar();
+        BotonDeSegundoPlano();
+        IniciarTrayIcon();
         
         alarm_button();
         timer_button();
@@ -94,6 +107,16 @@ public class Componentes extends JFrame {
         
         
     }
+    public void BotonDeSegundoPlano(){
+        backgroundButton=new JLabel("Segundo Plano");
+        backgroundButton.setLocation(30,(exitButton.getBounds().y)+5);
+        backgroundButton.setSize(120,20);
+        backgroundButton.setFont(new Font("Spectral",1,12));
+        backgroundButton.setForeground(Color.gray);
+        mouseListenerBackgroundButton();
+        ventana.add(backgroundButton);
+    }
+   
     
     public void sleep(long time){
         try {
@@ -151,6 +174,28 @@ public class Componentes extends JFrame {
         clock2.setVisible(false);
         ventana.add(clock2);
                 
+    }
+    
+    private void IniciarTrayIcon(){
+        //Imagen del TrayIcon
+        ImageIcon SystemImageIcon=new ImageIcon(this.getClass().getResource("/images/RelojIcon.png"));
+        Image image=SystemImageIcon.getImage();
+        //Menu del TrayIcon
+        PopupMenu menu_for_TrayIcon=new PopupMenu();
+        TI_tooltip_open=new MenuItem("Abrir");
+        TI_tooltip_close=new MenuItem("Cerrar");
+        menu_for_TrayIcon.add(TI_tooltip_open);
+        menu_for_TrayIcon.addSeparator();
+        menu_for_TrayIcon.add(TI_tooltip_close);
+        //Instancia del TrayIcon
+        trayicon=new TrayIcon(image,"Alarma",menu_for_TrayIcon);
+        trayicon.setImageAutoSize(true);
+        systemtray = SystemTray.getSystemTray();
+        //ActionListeners del TrayIcon
+        ActionListenerTrayIconOpenButton();
+        ActionListenerTrayIconCloseButton();
+        
+        
     }
     private void clock_button_12h(){
         clock_button_12h=new JLabel("[12H");
@@ -245,7 +290,7 @@ public class Componentes extends JFrame {
         mouseListenerStartStopButton();
         ventana.add(timer_start_stop_button);
     }
-    
+
     // Activacion de Threads
     
     private void activeTimer_Threads(){
@@ -297,6 +342,25 @@ public class Componentes extends JFrame {
         }
     }
     
+    //actionlisteners
+    
+    private void ActionListenerTrayIconOpenButton(){
+        TI_tooltip_open.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                systemtray.remove(trayicon);
+                setVisible(true);
+            }
+        });
+    }
+    private void ActionListenerTrayIconCloseButton(){
+        TI_tooltip_close.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                System.exit(0);
+            }
+        });
+    }
     //mouselisteners
     private void mouseListenerTimerButton(){
         MouseListener MLtimerL=new MouseListener() {
@@ -595,7 +659,41 @@ public class Componentes extends JFrame {
         };
         minimizeButton.addMouseListener(botonminimizar);
     }
-    
+    private void mouseListenerBackgroundButton(){
+        MouseListener botonsegundoplano=new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent me) {
+                try {
+                    if(SystemTray.isSupported()){
+                        systemtray.add(trayicon);
+                        setVisible(false);
+                    }
+                } catch (AWTException ex) {
+                    Logger.getLogger(Componentes.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent me) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent me) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent me) {
+                backgroundButton.setForeground(Color.LIGHT_GRAY);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent me) {
+                backgroundButton.setForeground(Color.GRAY);
+            }
+        };
+        backgroundButton.addMouseListener(botonsegundoplano);
+    }
+
     private void mouseListenerResetButton(){
         MouseListener resetbutton=new MouseListener() {
             @Override
@@ -647,8 +745,7 @@ public class Componentes extends JFrame {
                     if(timer_thread_is_not_start){
                         timer_thread.start();
                         timer_thread_is_not_start=false;
-                    }else{
-                        System.out.println("resume");
+                    }else{   
                         Temporizador.Resume();
                     }
                 }else{
