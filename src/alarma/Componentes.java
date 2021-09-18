@@ -1,4 +1,4 @@
-package alarma;
+ package alarma;
 
 import java.awt.AWTException;
 import java.awt.Color;
@@ -24,13 +24,13 @@ public class Componentes extends JFrame {
     
     private Thread timer_thread , clock1_thread, clock2_thread;
     private JPanel ventana ;
-    private JLabel timerButton, alarmButton, clockButton, exitButton, minimizeButton, backgroundButton;
+    private JLabel timerButton, alarmButton, alarmPickDay, alarmUpChangueDayButton, alarmDownChangueDayButton, clockButton, exitButton, minimizeButton, backgroundButton;
     private TrayIcon trayicon;
     private MenuItem TI_tooltip_open, TI_tooltip_close;
     private SystemTray systemtray;
-    private Runnable timer_runnable, clock1_runnable, clock2_runnable;
+    private Runnable alarm_runnable, timer_runnable, clock1_runnable, clock2_runnable;
     private boolean reloj_formato_estado, clock_default_color_buttons=true;
-    private boolean timer_default_startstopbutton=true, timer_default_resetbutton=false, timer_default_image_status=true, timer_thread_is_not_start=true;
+    private boolean timer_default_startstopbutton=true, timer_default_resetbutton=false, timer_thread_is_not_start=true;
     public JLabel alarm, clock1, clock2, clock_button_12h, clock_button_24h;
     public JLabel timer, timer_image, timer_reset_button, timer_start_stop_button, timer_dhms;
 
@@ -64,7 +64,8 @@ public class Componentes extends JFrame {
         clock1();
         clock2();
         
-        timer_image();
+        alarm_schedule_buttons();
+        
         timer_dhms();
         timer_reset_button();
         timer_start_and_stop_button();
@@ -117,7 +118,6 @@ public class Componentes extends JFrame {
         ventana.add(backgroundButton);
     }
    
-    
     public void sleep(long time){
         try {
             Thread.sleep(time);
@@ -141,9 +141,45 @@ public class Componentes extends JFrame {
         alarm.setForeground(Color.white);
         alarm.setFont(new Font("Pacifico",3,40));
         alarm.setBounds(177,135,145,45);
-        alarm.setVisible(true);
+        alarm.setVisible(false);
         mouseLstenerTitleAlarm();
         ventana.add(alarm);
+    }
+    public void alarm_schedule_buttons(){
+        String [] Smins, Shours, Sdays={"Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"};
+        Integer []mins, hours;
+        mins=new Integer[60];
+        hours=new Integer[25];
+        Smins=new String [60];
+        Shours=new String [25];
+        for(int i=0;i<60;i++) mins[i]=i;
+        for(int i=0;i<25;i++) hours[i]=i;
+        for(int i=0;i<hours.length;i++) Shours[i]=alarm_time_toString(i);
+        for(int i=0;i<mins.length;i++) Smins[i]=alarm_time_toString(i);
+        
+        //Instancias
+        alarmUpChangueDayButton=new JLabel(new ImageIcon(getClass().getResource("/images/Alarm_up.png")));
+        alarmDownChangueDayButton=new JLabel(new ImageIcon(getClass().getResource("/images/Alarm_up.png")));
+        alarmPickDay=new JLabel(Sdays[0]);
+        
+        alarmUpChangueDayButton.setBounds(30,30,30,30);
+        alarmPickDay.setBounds(50, 200, 100, 40);
+        alarmPickDay.setFont(new Font("Verdana",1,30));
+        alarmPickDay.setForeground(new Color(124,242,224));
+        alarmPickDay.setAlignmentX(SwingConstants.CENTER);
+        ventana.add(alarmPickDay);
+//        ventana.add(alarmUpChangueDayButton);
+//        ventana.add(alarmDownChangueDayButton);
+        
+    }
+    private String alarm_time_toString(int valor){
+        String time_toString="";
+        if(valor<10){
+            time_toString+="0"+String.valueOf(valor);
+        }else{
+            time_toString=String.valueOf(valor);
+        }
+        return time_toString;
     }
     
     public void clock_button(){
@@ -174,28 +210,6 @@ public class Componentes extends JFrame {
         clock2.setVisible(false);
         ventana.add(clock2);
                 
-    }
-    
-    private void IniciarTrayIcon(){
-        //Imagen del TrayIcon
-        ImageIcon SystemImageIcon=new ImageIcon(this.getClass().getResource("/images/RelojIcon.png"));
-        Image image=SystemImageIcon.getImage();
-        //Menu del TrayIcon
-        PopupMenu menu_for_TrayIcon=new PopupMenu();
-        TI_tooltip_open=new MenuItem("Abrir");
-        TI_tooltip_close=new MenuItem("Cerrar");
-        menu_for_TrayIcon.add(TI_tooltip_open);
-        menu_for_TrayIcon.addSeparator();
-        menu_for_TrayIcon.add(TI_tooltip_close);
-        //Instancia del TrayIcon
-        trayicon=new TrayIcon(image,"Alarma",menu_for_TrayIcon);
-        trayicon.setImageAutoSize(true);
-        systemtray = SystemTray.getSystemTray();
-        //ActionListeners del TrayIcon
-        ActionListenerTrayIconOpenButton();
-        ActionListenerTrayIconCloseButton();
-        
-        
     }
     private void clock_button_12h(){
         clock_button_12h=new JLabel("[12H");
@@ -237,17 +251,6 @@ public class Componentes extends JFrame {
         timer.setBounds(110,135,280,45);
         timer.setVisible(false);
         ventana.add(timer);
-    }
-    public void timer_image(){
-        int width, height,putOnCenterImageX;
-        timer_image=new JLabel(new ImageIcon(getClass().getResource("/images/timer.gif")), SwingConstants.CENTER);
-        width=new ImageIcon(getClass().getResource("/images/timer.gif")).getIconWidth();
-        height=new ImageIcon(getClass().getResource("/images/timer.gif")).getIconHeight();
-        putOnCenterImageX=(((ventana.getSize().width)-width)/2);
-        timer_image.setSize(width , height);
-        timer_image.setLocation(putOnCenterImageX , 45);
-        timer_image.setVisible(false);
-        ventana.add(timer_image);
     }
     private void timer_dhms(){
         int x, y;
@@ -291,8 +294,38 @@ public class Componentes extends JFrame {
         ventana.add(timer_start_stop_button);
     }
 
-    // Activacion de Threads
+    private void IniciarTrayIcon(){
+        
+        //Imagen del TrayIcon
+        ImageIcon SystemImageIcon=new ImageIcon(this.getClass().getResource("/images/RelojIcon.png"));
+        Image image=SystemImageIcon.getImage();
+        
+        //Menu del TrayIcon
+        PopupMenu menu_for_TrayIcon=new PopupMenu();
+        TI_tooltip_open=new MenuItem("Abrir");
+        TI_tooltip_close=new MenuItem("Cerrar");
+        menu_for_TrayIcon.add(TI_tooltip_open);
+        menu_for_TrayIcon.addSeparator();
+        menu_for_TrayIcon.add(TI_tooltip_close);
+        
+        //Instancia del TrayIcon
+        trayicon=new TrayIcon(image,"Alarma",menu_for_TrayIcon);
+        trayicon.setImageAutoSize(true);
+        systemtray = SystemTray.getSystemTray();
+        
+        //ActionListeners del TrayIcon
+        ActionListenerTrayIconOpenButton();
+        ActionListenerTrayIconCloseButton();
+        
+        
+    }
+    //Activacion de Threads
     
+    private void activeAlarm_Threads(String day, int hour, int min){
+        Runnable alarma=new Alarma(day, hour, min);
+        Thread alarma_thread=new Thread(alarma);
+        alarma_thread.start();
+    }
     private void activeTimer_Threads(){
         timer_runnable=new Temporizador();
         timer_thread=new Thread(timer_runnable);
@@ -322,13 +355,11 @@ public class Componentes extends JFrame {
     public void setVisibleTimerInterfaz(boolean status){
         if(status){
             timer.setVisible(status);
-            timer_image.setVisible(status);
             timer_dhms.setVisible(status);
             timer_reset_button.setVisible(status);
             timer_start_stop_button.setVisible(status);
         }else{
             timer.setVisible(status);
-            timer_image.setVisible(status);
             timer_dhms.setVisible(status);
             timer_reset_button.setVisible(status);
             timer_start_stop_button.setVisible(status);
@@ -336,9 +367,17 @@ public class Componentes extends JFrame {
     }
     public void setVisibleAlarmInterfaz(boolean status){
         if(status){
-            alarm.setVisible(status);
+//            alarm.setVisible(status);
+            alarmPickDay.setVisible(status);
+            alarmPickHour.setVisible(status);
+            alarmPickMin.setVisible(status);
+            alarmDownChangueDayButton.setVisible(status);
         }else{
-            alarm.setVisible(status);
+//            alarm.setVisible(status);
+            alarmPickDay.setVisible(status);
+            alarmPickHour.setVisible(status);
+            alarmPickMin.setVisible(status);
+            alarmDownChangueDayButton.setVisible(status);
         }
     }
     
@@ -361,7 +400,9 @@ public class Componentes extends JFrame {
             }
         });
     }
+    
     //mouselisteners
+    
     private void mouseListenerTimerButton(){
         MouseListener MLtimerL=new MouseListener() {
             @Override
@@ -376,14 +417,7 @@ public class Componentes extends JFrame {
                 if(timerButton.getForeground().equals(Color.CYAN)){
                     setVisibleAlarmInterfaz(false);
                     setVisibleClockInterfaz(false);
-                    if(timer_default_image_status){
-//                        timerImage.setVisible(true);
-                        timer.setVisible(true);
-                        timer_dhms.setVisible(true);
-                        timer_reset_button.setVisible(true);
-                        timer_start_stop_button.setVisible(true);
-//                        timer_default_image_status=false;
-                    }
+                    setVisibleTimerInterfaz(true);
                 }
             }
 
@@ -426,7 +460,7 @@ public class Componentes extends JFrame {
                 if(alarmButton.getForeground().equals(Color.CYAN)){
                     setVisibleTimerInterfaz(false);
                     setVisibleClockInterfaz(false);
-                    alarm.setVisible(true);
+                    setVisibleAlarmInterfaz(true);
                 }
                 timerButton.setFont(new Font("Segoe Print",1,15));
                 clockButton.setFont(new Font("Segoe Print",1,15));
