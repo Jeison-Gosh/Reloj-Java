@@ -4,6 +4,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Temporizador implements Runnable {
+    
     private static int d,h,m,s;
     private static boolean stop;
     private static String dd,hh,mm,ss,stopWatch;
@@ -21,8 +22,8 @@ public class Temporizador implements Runnable {
         Temporizador.m = 0;
         Temporizador.s = 0;
     }
-    
     @Override
+    
     public void run() {
         while(true){
             if(stop==false){
@@ -35,7 +36,6 @@ public class Temporizador implements Runnable {
             }
         }
     }
-    
     private String chronometer(){
         
         ss=parseToString(s);
@@ -77,7 +77,6 @@ public class Temporizador implements Runnable {
         dd="";
         Main.aplicacion.timer.setText("00:00:00:00");
     }
-   
     private String parseToString(int valor){
         String string_valor;
         if(valor<10){
@@ -88,6 +87,4 @@ public class Temporizador implements Runnable {
         return string_valor;
     }
 
-    
-    
 }

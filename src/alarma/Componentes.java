@@ -19,18 +19,24 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;  
 import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
 
 public class Componentes extends JFrame {
     
+    
+    private JPanel panel;
     private Thread timer_thread , clock1_thread, clock2_thread;
-    private JPanel ventana ;
-    private JLabel timerButton, alarmButton, alarmPickDay, alarmUpChangueDayButton, alarmDownChangueDayButton, clockButton, exitButton, minimizeButton, backgroundButton;
+    private JLabel alarmButton, timerButton, clockButton, exitButton, minimizeButton, backgroundButton;
+    private JLabel  alarmPickDay, alarmPickHour, alarmPickMinute, alarmPickMeridian, alarmTwoPointsMeridian, alarmScheduleButton;
     private TrayIcon trayicon;
     private MenuItem TI_tooltip_open, TI_tooltip_close;
     private SystemTray systemtray;
     private Runnable alarm_runnable, timer_runnable, clock1_runnable, clock2_runnable;
-    private boolean reloj_formato_estado, clock_default_color_buttons=true;
+    private int alarm_day_count, alarm_hour_count, alarm_minute_count;
+    private boolean reloj_formato_estado, clock_default_color_buttons=true, alarmStatusMeridian=true;
     private boolean timer_default_startstopbutton=true, timer_default_resetbutton=false, timer_thread_is_not_start=true;
+    private String [] Smins, Shours, Sdays;
+    private Integer []mins, hours;
     public JLabel alarm, clock1, clock2, clock_button_12h, clock_button_24h;
     public JLabel timer, timer_image, timer_reset_button, timer_start_stop_button, timer_dhms;
 
@@ -59,12 +65,12 @@ public class Componentes extends JFrame {
         timer_button();
         clock_button();
         
-        alarm();
+        alarm_schedule();
         timer();
         clock1();
         clock2();
         
-        alarm_schedule_buttons();
+        alarm();
         
         timer_dhms();
         timer_reset_button();
@@ -80,12 +86,13 @@ public class Componentes extends JFrame {
 //        watchLayouts();
     } 
     public void PanelDeEntrada(){
-        ventana=new JPanel();
-        ventana.setSize(500,500);
-        ventana.setBackground(Color.black);
-        ventana.setLayout(null);
+        panel=new JPanel();
+        panel.setSize(500,500);
+        panel.setBackground(Color.black);
+        panel.setLayout(null);
+        panel.setBorder(new LineBorder(new Color(72,71,73)));
 //        this.getContentPane().add(ventana); // para versiones de java inferiores a 5.0 (aun sirve en versiones actuales)
-        add(ventana); //Solamente para versiones de java superiores a la 5.0
+        add(panel); //Solamente para versiones de java superiores a la 5.0
     }
     public void BotonDeCierre() {
         exitButton=new JLabel("X");
@@ -94,7 +101,7 @@ public class Componentes extends JFrame {
         exitButton.setHorizontalAlignment(SwingConstants.CENTER);
         exitButton.setBounds(475,2,20,20);
         mouseListenerExitButton();
-        ventana.add(exitButton);
+        panel.add(exitButton);
     }
     public void BotonDeMinimizar() {
         minimizeButton=new JLabel("-");
@@ -104,7 +111,7 @@ public class Componentes extends JFrame {
         minimizeButton.setLocation(exitButton.getBounds().x-30, exitButton.getBounds().y-5);
         minimizeButton.setSize(20,20);
         mouseListenerMinimizeButton();
-        ventana.add(minimizeButton);
+        panel.add(minimizeButton);
         
         
     }
@@ -115,7 +122,7 @@ public class Componentes extends JFrame {
         backgroundButton.setFont(new Font("Spectral",1,12));
         backgroundButton.setForeground(Color.gray);
         mouseListenerBackgroundButton();
-        ventana.add(backgroundButton);
+        panel.add(backgroundButton);
     }
    
     public void sleep(long time){
@@ -133,9 +140,9 @@ public class Componentes extends JFrame {
         alarmButton.setHorizontalAlignment(SwingConstants.CENTER);
         alarmButton.setBounds(50,425,70,25);
         mouseListenerAlarmButton();
-        ventana.add(alarmButton);
+        panel.add(alarmButton);
     }
-    public void alarm(){
+    public void alarm_schedule(){
         alarm=new JLabel("Alarma");
         alarm.setHorizontalAlignment(SwingConstants.CENTER);
         alarm.setForeground(Color.white);
@@ -143,34 +150,79 @@ public class Componentes extends JFrame {
         alarm.setBounds(177,135,145,45);
         alarm.setVisible(false);
         mouseLstenerTitleAlarm();
-        ventana.add(alarm);
+        panel.add(alarm);
     }
-    public void alarm_schedule_buttons(){
-        String [] Smins, Shours, Sdays={"Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"};
-        Integer []mins, hours;
+    public void alarm(){
+        Sdays=new String[]{"Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"};
         mins=new Integer[60];
-        hours=new Integer[25];
+        hours=new Integer[12];
         Smins=new String [60];
-        Shours=new String [25];
+        Shours=new String [12];
         for(int i=0;i<60;i++) mins[i]=i;
-        for(int i=0;i<25;i++) hours[i]=i;
-        for(int i=0;i<hours.length;i++) Shours[i]=alarm_time_toString(i);
+        for(int i=0;i<12;i++) hours[i]=i;
+        for(int i=0;i<hours.length;i++) Shours[i]=alarm_time_toString(i+1);
         for(int i=0;i<mins.length;i++) Smins[i]=alarm_time_toString(i);
         
         //Instancias
-        alarmUpChangueDayButton=new JLabel(new ImageIcon(getClass().getResource("/images/Alarm_up.png")));
-        alarmDownChangueDayButton=new JLabel(new ImageIcon(getClass().getResource("/images/Alarm_up.png")));
-        alarmPickDay=new JLabel(Sdays[0]);
+        alarmTwoPointsMeridian=new JLabel(":");
+        alarmScheduleButton=new JLabel("PROGRAMAR");
+        alarmPickMeridian=new JLabel("P.M");
+        alarmPickMinute=new JLabel(Smins[0]);
+        alarmPickHour=new JLabel(Shours[5]);
+        alarmPickDay=new JLabel(Sdays[1]);
+        alarm_day_count=1;
+        alarm_hour_count=5;
+        alarm_minute_count=0;
         
-        alarmUpChangueDayButton.setBounds(30,30,30,30);
-        alarmPickDay.setBounds(50, 200, 100, 40);
+        //Button scheduleButton
+        alarmScheduleButton.setBounds(187,275,126,20);
+        alarmScheduleButton.setOpaque(true);
+        alarmScheduleButton.setFont(new Font("Cambria",1,18));
+        alarmScheduleButton.setForeground(Color.WHITE);
+        alarmScheduleButton.setBackground(Color.CYAN);
+        alarmScheduleButton.setHorizontalAlignment(SwingConstants.CENTER);
+        mouseListenerAlarmScheduleButton();
+        panel.add(alarmScheduleButton);
+        
+        //Button pickDay
+        alarmPickDay.setBounds(30,205,160,35);
         alarmPickDay.setFont(new Font("Verdana",1,30));
         alarmPickDay.setForeground(new Color(124,242,224));
-        alarmPickDay.setAlignmentX(SwingConstants.CENTER);
-        ventana.add(alarmPickDay);
-//        ventana.add(alarmUpChangueDayButton);
-//        ventana.add(alarmDownChangueDayButton);
+        alarmPickDay.setHorizontalAlignment(SwingConstants.CENTER);
+        mouseListenerAlarmPickDay();
+        panel.add(alarmPickDay);
         
+        //Button pickHour
+        alarmPickHour.setBounds(195,200,60,45);
+        alarmPickHour.setFont(new Font("Verdana",1,40));
+        alarmPickHour.setForeground(new Color(193,222,221));
+        alarmPickDay.setHorizontalAlignment(SwingConstants.CENTER);
+        mouseListenerAlarmPickHour();
+        panel.add(alarmPickHour);
+        
+        //Button twoPointsMeridian
+        alarmTwoPointsMeridian.setBounds(260,200,20,45);
+        alarmTwoPointsMeridian.setFont(new Font("Verdana",1,40));
+        alarmTwoPointsMeridian.setForeground(new Color(193,222,221));
+        alarmTwoPointsMeridian.setHorizontalAlignment(SwingConstants.CENTER);
+        panel.add(alarmTwoPointsMeridian);
+        
+        //Button pickMinute
+        alarmPickMinute.setBounds(285,200,60,45);
+        alarmPickMinute.setFont(new Font("Verdana",1,40));
+        alarmPickMinute.setForeground(new Color(193,222,221));
+        alarmPickMinute.setHorizontalAlignment(SwingConstants.CENTER);
+        mouseListenerAlarmPickMinute();
+        panel.add(alarmPickMinute);
+        
+        //Button pickMeridian
+        alarmPickMeridian.setBounds(355,210,40,35);
+        alarmPickMeridian.setFont(new Font("Times",1,22));
+        alarmPickMeridian.setForeground(Color.MAGENTA);
+        alarmPickMeridian.setHorizontalAlignment(SwingConstants.CENTER);
+        mouseListenerAlarmPickMeridian();
+        panel.add(alarmPickMeridian);
+
     }
     private String alarm_time_toString(int valor){
         String time_toString="";
@@ -182,58 +234,6 @@ public class Componentes extends JFrame {
         return time_toString;
     }
     
-    public void clock_button(){
-        clockButton=new JLabel("Reloj");
-        clockButton.setFont(new Font("Segoe Print",1,15));
-        clockButton.setForeground(Color.gray);
-        clockButton.setHorizontalAlignment(SwingConstants.CENTER);
-        clockButton.setBounds(410,425,43,25);
-        mouseListenerClockButton();
-        ventana.add(clockButton);
-    }
-    public void clock1(){
-        clock1=new JLabel("Reloj");
-        clock1.setHorizontalAlignment(SwingConstants.CENTER);
-        clock1.setForeground(Color.magenta);
-        clock1.setFont(new Font("Pacifico",1,40));
-        clock1.setBounds(110,135,280,45);
-        clock1.setVisible(false);
-        ventana.add(clock1);
-                
-    }
-    public void clock2(){
-        clock2=new JLabel("Reloj");
-        clock2.setHorizontalAlignment(SwingConstants.CENTER);
-        clock2.setForeground(Color.magenta);
-        clock2.setFont(new Font("Pacifico",1,40));
-        clock2.setBounds(110,135,280,45);
-        clock2.setVisible(false);
-        ventana.add(clock2);
-                
-    }
-    private void clock_button_12h(){
-        clock_button_12h=new JLabel("[12H");
-        clock_button_12h.setSize(55,25);
-        clock_button_12h.setFont(new Font("Sitka",1,20));
-        clock_button_12h.setHorizontalAlignment(SwingConstants.CENTER);
-        clock_button_12h.setForeground(Color.gray);
-        clock_button_12h.setLocation(clock1.getLocation().x+87, clock1.getLocation().y+55);
-        clock_button_12h.setVisible(false);
-        mouseListenerButton12h();
-        ventana.add(clock_button_12h);
-    }
-    private void clock_button_24h(){
-        clock_button_24h=new JLabel("24H]");
-        clock_button_24h.setSize(55,25);
-        clock_button_24h.setFont(new Font("Sitka",1,20));
-        clock_button_24h.setHorizontalAlignment(SwingConstants.CENTER);
-        clock_button_24h.setForeground(Color.gray);
-        clock_button_24h.setLocation(clock1.getLocation().x+142, clock1.getLocation().y+55);
-        clock_button_24h.setVisible(false);
-        mouseListenerButton24h();
-        ventana.add(clock_button_24h);
-    }
-    
     public void timer_button(){
        timerButton=new JLabel("Temporizador");
        timerButton.setFont(new Font("Segoe Print",1,15));
@@ -241,7 +241,7 @@ public class Componentes extends JFrame {
        timerButton.setForeground(Color.gray);
        timerButton.setHorizontalAlignment(SwingConstants.CENTER);
        mouseListenerTimerButton();
-       ventana.add(timerButton);
+       panel.add(timerButton);
     }
     public void timer(){
         timer=new JLabel("00:00:00:00");
@@ -250,7 +250,7 @@ public class Componentes extends JFrame {
         timer.setFont(new Font("Pacifico",1,40));
         timer.setBounds(110,135,280,45);
         timer.setVisible(false);
-        ventana.add(timer);
+        panel.add(timer);
     }
     private void timer_dhms(){
         int x, y;
@@ -262,7 +262,7 @@ public class Componentes extends JFrame {
         timer_dhms.setFont(new Font("Times",1,15));
         timer_dhms.setBounds(x, y, 240, 20);
         timer_dhms.setVisible(false);
-        ventana.add(timer_dhms);
+        panel.add(timer_dhms);
     }
     private void timer_reset_button(){
         int x, y;
@@ -276,7 +276,7 @@ public class Componentes extends JFrame {
         timer_reset_button.setLocation(x,y);
         timer_reset_button.setSize(65,30);
         mouseListenerResetButton();
-        ventana.add(timer_reset_button);
+        panel.add(timer_reset_button);
         
     }
     private void timer_start_and_stop_button(){
@@ -291,7 +291,59 @@ public class Componentes extends JFrame {
         timer_start_stop_button.setLocation(x,y);
         timer_start_stop_button.setSize(65,30);
         mouseListenerStartStopButton();
-        ventana.add(timer_start_stop_button);
+        panel.add(timer_start_stop_button);
+    }
+    
+    public void clock_button(){
+        clockButton=new JLabel("Reloj");
+        clockButton.setFont(new Font("Segoe Print",1,15));
+        clockButton.setForeground(Color.gray);
+        clockButton.setHorizontalAlignment(SwingConstants.CENTER);
+        clockButton.setBounds(410,425,43,25);
+        mouseListenerClockButton();
+        panel.add(clockButton);
+    }
+    public void clock1(){
+        clock1=new JLabel("Reloj");
+        clock1.setHorizontalAlignment(SwingConstants.CENTER);
+        clock1.setForeground(Color.magenta);
+        clock1.setFont(new Font("Pacifico",1,40));
+        clock1.setBounds(110,135,280,45);
+        clock1.setVisible(false);
+        panel.add(clock1);
+                
+    }
+    public void clock2(){
+        clock2=new JLabel("Reloj");
+        clock2.setHorizontalAlignment(SwingConstants.CENTER);
+        clock2.setForeground(Color.magenta);
+        clock2.setFont(new Font("Pacifico",1,40));
+        clock2.setBounds(110,135,280,45);
+        clock2.setVisible(false);
+        panel.add(clock2);
+                
+    }
+    private void clock_button_12h(){
+        clock_button_12h=new JLabel("[12H");
+        clock_button_12h.setSize(55,25);
+        clock_button_12h.setFont(new Font("Sitka",1,20));
+        clock_button_12h.setHorizontalAlignment(SwingConstants.CENTER);
+        clock_button_12h.setForeground(Color.gray);
+        clock_button_12h.setLocation(clock1.getLocation().x+87, clock1.getLocation().y+55);
+        clock_button_12h.setVisible(false);
+        mouseListenerButton12h();
+        panel.add(clock_button_12h);
+    }
+    private void clock_button_24h(){
+        clock_button_24h=new JLabel("24H]");
+        clock_button_24h.setSize(55,25);
+        clock_button_24h.setFont(new Font("Sitka",1,20));
+        clock_button_24h.setHorizontalAlignment(SwingConstants.CENTER);
+        clock_button_24h.setForeground(Color.gray);
+        clock_button_24h.setLocation(clock1.getLocation().x+142, clock1.getLocation().y+55);
+        clock_button_24h.setVisible(false);
+        mouseListenerButton24h();
+        panel.add(clock_button_24h);
     }
 
     private void IniciarTrayIcon(){
@@ -321,8 +373,8 @@ public class Componentes extends JFrame {
     }
     //Activacion de Threads
     
-    private void activeAlarm_Threads(String day, int hour, int min){
-        Runnable alarma=new Alarma(day, hour, min);
+    private void activeAlarm_Threads(String name, String day, int hour, int min){
+        Runnable alarma=new Alarma(name, day, hour, min);
         Thread alarma_thread=new Thread(alarma);
         alarma_thread.start();
     }
@@ -339,17 +391,22 @@ public class Componentes extends JFrame {
         clock2_thread.start();
     }
     
-    public void setVisibleClockInterfaz(boolean status){
+    public void setVisibleAlarmInterfaz(boolean status){
         if(status){
-            clock1.setVisible(status);
-            clock2.setVisible(status);
-            clock_button_12h.setVisible(status);
-            clock_button_24h.setVisible(status);
+            alarm.setVisible(status);
+            alarmTwoPointsMeridian.setVisible(status);
+            alarmPickMeridian.setVisible(status);
+            alarmPickMinute.setVisible(status);
+            alarmPickHour.setVisible(status);
+            alarmPickDay.setVisible(status);
         }else{
-            clock1.setVisible(status);
-            clock2.setVisible(status);
-            clock_button_12h.setVisible(status);
-            clock_button_24h.setVisible(status);
+            alarm.setVisible(status);
+            alarmTwoPointsMeridian.setVisible(status);
+            alarmPickMeridian.setVisible(status);            
+            alarmPickMinute.setVisible(status);
+            alarmPickHour.setVisible(status);
+            alarmPickDay.setVisible(status);
+            
         }
     }
     public void setVisibleTimerInterfaz(boolean status){
@@ -365,24 +422,21 @@ public class Componentes extends JFrame {
             timer_start_stop_button.setVisible(status);
         }
     }
-    public void setVisibleAlarmInterfaz(boolean status){
+    public void setVisibleClockInterfaz(boolean status){
         if(status){
-//            alarm.setVisible(status);
-            alarmPickDay.setVisible(status);
-            alarmPickHour.setVisible(status);
-            alarmPickMin.setVisible(status);
-            alarmDownChangueDayButton.setVisible(status);
+            clock1.setVisible(status);
+            clock2.setVisible(status);
+            clock_button_12h.setVisible(status);
+            clock_button_24h.setVisible(status);
         }else{
-//            alarm.setVisible(status);
-            alarmPickDay.setVisible(status);
-            alarmPickHour.setVisible(status);
-            alarmPickMin.setVisible(status);
-            alarmDownChangueDayButton.setVisible(status);
+            clock1.setVisible(status);
+            clock2.setVisible(status);
+            clock_button_12h.setVisible(status);
+            clock_button_24h.setVisible(status);
         }
     }
     
     //actionlisteners
-    
     private void ActionListenerTrayIconOpenButton(){
         TI_tooltip_open.addActionListener(new ActionListener() {
             @Override
@@ -400,9 +454,164 @@ public class Componentes extends JFrame {
             }
         });
     }
+    private void mouseListenerAlarmPickDay(){
+        MouseListener alarmpickday = new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent me) {
+                if(alarm_day_count<6){
+                    alarm_day_count++;
+                    alarmPickDay.setText(Sdays[alarm_day_count]);
+                }else{
+                    alarm_day_count=0;
+                    alarmPickDay.setText(Sdays[alarm_day_count]);
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent me) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent me) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent me) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent me) {
+            }
+        };
+        alarmPickDay.addMouseListener(alarmpickday);
+    }
+    private void mouseListenerAlarmPickHour(){
+        MouseListener alarmpickhour = new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent me) {
+                if(alarm_hour_count<11){
+                    alarm_hour_count++;
+                    alarmPickHour.setText(Shours[alarm_hour_count]);
+                }else{
+                    alarm_hour_count=0;
+                    alarmPickHour.setText(Shours[alarm_hour_count]);
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent me) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent me) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent me) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent me) {
+            }
+        };
+        alarmPickHour.addMouseListener(alarmpickhour);
+
+      
+    }
+    private void mouseListenerAlarmPickMinute(){
+        MouseListener alarmpickminute = new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent me) {
+                if(alarm_minute_count<59){
+                    alarm_minute_count++;
+                    alarmPickMinute.setText(Smins[alarm_minute_count]);
+                }else{
+                    alarm_minute_count=0;
+                    alarmPickMinute.setText(Smins[alarm_minute_count]);
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent me) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent me) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent me) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent me) {
+            }
+        };
+        alarmPickMinute.addMouseListener(alarmpickminute);
+    }
+    private void mouseListenerAlarmPickMeridian(){
+        MouseListener alarmpickmeridan = new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent me) {
+                if(alarmStatusMeridian){
+                    alarmStatusMeridian=false;
+                    alarmPickMeridian.setText("P.M");
+                }else{
+                    alarmStatusMeridian=true;
+                    alarmPickMeridian.setText("A.M");
+                
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent me) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent me) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent me) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent me) {
+            }
+
+           
+        };
+        alarmPickMeridian.addMouseListener(alarmpickmeridan);
+    }
+    private void mouseListenerAlarmScheduleButton(){
+        MouseListener alarmschedulebutton = new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent me) {
+                
+            }
+
+            @Override
+            public void mousePressed(MouseEvent me) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent me) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent me) {
+                alarmScheduleButton.setFont(new Font("Cambria",1,20));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent me) {
+                alarmScheduleButton.setFont(new Font("Cambria",1,18));
+            }
+        };
+        alarmScheduleButton.addMouseListener(alarmschedulebutton);
+    }
     
     //mouselisteners
-    
     private void mouseListenerTimerButton(){
         MouseListener MLtimerL=new MouseListener() {
             @Override
@@ -846,12 +1055,16 @@ public class Componentes extends JFrame {
     private void watchLayouts(){
         alarmButton.setOpaque(true);
         alarm.setOpaque(true);
+        alarmPickDay.setOpaque(true);
+        alarmPickHour.setOpaque(true);
+        alarmPickMinute.setOpaque(true);
+        alarmPickMeridian.setOpaque(true);
+        alarmTwoPointsMeridian.setOpaque(true);
         clockButton.setOpaque(true);
         clock1.setOpaque(true);
         clock2.setOpaque(true);
         timerButton.setOpaque(true);
         timer.setOpaque(true);
-        timer_image.setOpaque(true);
         timer_dhms.setOpaque(true);
         timer_reset_button.setOpaque(true);
         timer_start_stop_button.setOpaque(true);
