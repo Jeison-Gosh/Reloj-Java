@@ -34,7 +34,7 @@ public class Mensaje extends JFrame {
     private void Panel(){
         panel = new JPanel();
         panel.setSize(330,100);
-        panel.setBackground(Color.black);
+        panel.setBackground(Color.decode("#0B0705"));
         panel.setLayout(null);
         panel.setBorder(new LineBorder(new Color(62,60,63)));
         add(panel);
@@ -54,11 +54,11 @@ public class Mensaje extends JFrame {
         botonSalir.setHorizontalAlignment(SwingConstants.CENTER);
         botonSalir.setForeground(Color.gray);
         botonSalir.setBackground(Color.cyan);
-        botonSalir.setFont(new Font("Times",1,18));
-        mouseListenerBotonSalir();
+        botonSalir.setFont(new Font("Cambria",1,18));
+        mouseListenerCloseButton();
         panel.add(botonSalir);
     }
-    private void mouseListenerBotonSalir(){
+    private void mouseListenerCloseButton(){
         MouseListener botonsalir = new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent me) {
@@ -76,13 +76,13 @@ public class Mensaje extends JFrame {
 
             @Override
             public void mouseEntered(MouseEvent me) {
-                botonSalir.setFont(new Font("Times",1,24));
+                botonSalir.setFont(new Font("Cambria",1,24));
                 botonSalir.setForeground(Color.white);
             }
 
             @Override
             public void mouseExited(MouseEvent me) {
-                botonSalir.setFont(new Font("Times",1,21));
+                botonSalir.setFont(new Font("Cambria",1,21));
                 botonSalir.setForeground(Color.gray);
             }
         };

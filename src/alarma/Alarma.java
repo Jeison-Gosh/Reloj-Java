@@ -60,14 +60,16 @@ public class Alarma implements Runnable{
             hour=(this.hour-calendar.get(Calendar.HOUR_OF_DAY))*3600000;
             min=(this.min-calendar.get(Calendar.MINUTE))*60000;
             diff=min+hour;
-            if(diff<=60000) diff=5000;
-            else diff-=60000;
+            if(diff<0){diff=(((24-calendar.get(Calendar.HOUR_OF_DAY))*3600000)-(calendar.get(Calendar.MINUTE)*60000));}
+            else if(diff<=60000){ diff=5000;}
+            else{diff-=60000;}
         }else{
             //horas y minutos faltantes para llegar a las 24H
             hour=(24-calendar.get(Calendar.HOUR_OF_DAY))*3600000;
             min=calendar.get(Calendar.MINUTE)*60000;
             diff=hour-min;
         }
+        System.out.println("la diferencia de tiempo es: "+diff);
         return diff;
     }
     private boolean check_day(){
