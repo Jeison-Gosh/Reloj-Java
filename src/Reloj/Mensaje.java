@@ -1,4 +1,4 @@
-package alarma;
+package Reloj;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -16,6 +16,8 @@ public class Mensaje extends JFrame {
     
     public Mensaje(){
         InitComponents();
+        setFocusableWindowState(false);
+        setAlwaysOnTop(true);
         setSize(330,100);
         setResizable(false);
         setUndecorated(true);

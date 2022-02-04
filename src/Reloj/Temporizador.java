@@ -1,4 +1,4 @@
-package alarma;
+package Reloj;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

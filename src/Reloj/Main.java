@@ -1,4 +1,4 @@
-    package alarma;
+    package Reloj;
 
 public class Main {
     

@@ -1,28 +1,33 @@
-package alarma;
+package Reloj;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
+import java.util.ListIterator;
 
 
 public class Alarma implements Runnable{
-    
-    private boolean AlarmStatus;
+
+    private static long counter;
+    private boolean AlarmIsOn;
     private final int hour;
     private final int min;
     private final String day;
     private final String AlarmName;
     private Calendar calendar;
-
+    
     public Alarma(String AlarmName, String day, int hour, int min) {
+        Alarma.counter = 0;
         this.AlarmName = AlarmName;
         this.day = day;
         this.hour = hour;
         this.min = min;
-        this.AlarmStatus = true;
+        this.AlarmIsOn = true;
     }
+    
     @Override
     public void run() {
-        while(AlarmStatus){
+        while(AlarmIsOn){
             if(check_day() && check_time()){
                 run_alarm();
             }else{
@@ -32,13 +37,39 @@ public class Alarma implements Runnable{
             }
         }
     }
+
+    @Override
+    public String toString(){
+        String string=this.AlarmName+" "+this.day+" "+this.hour+" "+this.min;
+        return string;
+    }
     public void cancel_alarm(){
-        this.AlarmStatus = false;
+        this.AlarmIsOn = false;
+    }
+    public String getCode(){
+        return AlarmName+day+hour+min;
     }
     public String getAlarmName(){
         return this.AlarmName;
     }
-    private String getDay(){
+    public String getDay(){
+        return day; 
+    }
+    public int getHour() {
+        return hour;
+    }
+    public int getMin() {
+        return min;
+    }
+    public String getTime(){
+        if(min<10){
+            return hour+":"+"0"+min;
+        }else{
+            return hour+":"+min;
+        }
+    }
+    
+    private String getToday(){
         int number_of_day;
         String day="";
         calendar = new GregorianCalendar();
@@ -74,7 +105,7 @@ public class Alarma implements Runnable{
     }
     private boolean check_day(){
         boolean is_the_day=false;
-        if(getDay().equals(day)){
+        if(getToday().equals(day)){
             is_the_day=true;
         }
         return is_the_day;
@@ -89,14 +120,56 @@ public class Alarma implements Runnable{
         }
         return is_the_time;
     }
+    
     private synchronized void run_alarm (){
         if(check_day() && check_time()){
             System.out.println("Alarma esta sonando");
             System.out.println("Alarma esta sonando");
             System.out.println("Alarma esta sonando");
             System.out.println("Alarma esta sonando");
-            AlarmStatus=false;
+            AlarmIsOn=false;            
+//            boolean DeadThreadExist=true;
+//            while(DeadThreadExist){
+//                Iterator<Thread> itt=Main.aplicacion.alarm_list_thread.iterator();
+//                Iterator<Alarma> ita=Main.aplicacion.alarm_list.iterator();
+//                boolean FoundDeadThread=false;
+//                while(itt.hasNext()){
+//                    itt.next();
+//                    ita.next();
+//                    if(!ita.AlarmIsOn && !ita.getCode().equals(this.getCode())){
+//                        FoundDeadThread=true;
+//                        break;
+//                    }
+//                }
+//                if(FoundDeadThread){
+//                    itt.remove();
+//                    ita.remove();
+//                }
+//                int count=0;
+//                for(Alarma a: Main.aplicacion.alarm_list){
+//                    if(!a.AlarmIsOn) count++;
+////                    System.out.println(a.getCode());
+//                }
+////                System.out.println("tamaño "+Main.aplicacion.alarm_list.size());
+//                if(count==0 || Main.aplicacion.alarm_list.size()==1) DeadThreadExist=false;
+//            }
+            ListIterator<Thread> itt=Main.aplicacion.alarm_list_thread.listIterator();
+            ListIterator<Alarma> ita=Main.aplicacion.alarm_list.listIterator();
+            while(itt.hasNext()){
+                
+                if(!ita.next().getCode().equals(this.getCode()) && !ita.next().AlarmIsOn){
+                    System.out.println(ita.next().getAlarmName());
+                    System.out.println(itt.next().getName());
+                }
+            }
+            
+            System.out.println("asi quedo la lista T: ");
+            for(Thread t: Main.aplicacion.alarm_list_thread){
+                System.out.print(" "+t+" ");
+            }
         }
+        
     }
+    
   
 }
