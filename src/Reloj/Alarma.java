@@ -1,8 +1,8 @@
 package Reloj;
 
+import java.awt.Color;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.ListIterator;
 
 
@@ -128,39 +128,20 @@ public class Alarma implements Runnable{
             System.out.println("Alarma esta sonando");
             System.out.println("Alarma esta sonando");
             AlarmIsOn=false;            
-//            boolean DeadThreadExist=true;
-//            while(DeadThreadExist){
-//                Iterator<Thread> itt=Main.aplicacion.alarm_list_thread.iterator();
-//                Iterator<Alarma> ita=Main.aplicacion.alarm_list.iterator();
-//                boolean FoundDeadThread=false;
-//                while(itt.hasNext()){
-//                    itt.next();
-//                    ita.next();
-//                    if(!ita.AlarmIsOn && !ita.getCode().equals(this.getCode())){
-//                        FoundDeadThread=true;
-//                        break;
-//                    }
-//                }
-//                if(FoundDeadThread){
-//                    itt.remove();
-//                    ita.remove();
-//                }
-//                int count=0;
-//                for(Alarma a: Main.aplicacion.alarm_list){
-//                    if(!a.AlarmIsOn) count++;
-////                    System.out.println(a.getCode());
-//                }
-////                System.out.println("tamaño "+Main.aplicacion.alarm_list.size());
-//                if(count==0 || Main.aplicacion.alarm_list.size()==1) DeadThreadExist=false;
-//            }
             ListIterator<Thread> itt=Main.aplicacion.alarm_list_thread.listIterator();
             ListIterator<Alarma> ita=Main.aplicacion.alarm_list.listIterator();
-            while(itt.hasNext()){
-                
-                if(!ita.next().getCode().equals(this.getCode()) && !ita.next().AlarmIsOn){
-                    System.out.println(ita.next().getAlarmName());
-                    System.out.println(itt.next().getName());
+            while(itt.hasNext() && ita.hasNext()){
+                Alarma a=ita.next();
+                itt.next();
+                if(!a.AlarmIsOn && !a.getCode().equals(this.getCode())){
+                    ita.remove();
+                    itt.remove();
                 }
+            }
+            if(Main.aplicacion.alarm_list.size()<=1){ 
+                Main.aplicacion.alarmShowListButton.setForeground(Color.decode("#9F6469"));
+                Main.aplicacion.alarmShowListButton.setEnabled(false);
+                
             }
             
             System.out.println("asi quedo la lista T: ");

@@ -1,10 +1,15 @@
-    package Reloj;
+package Reloj;
 
 public class Main {
     
-    public static Componentes aplicacion=new Componentes();
+    public static Componentes aplicacion;
     
     public static void main(String[] args) {
-        aplicacion.setVisible(true);    
+        try{
+            aplicacion=new Componentes();
+            aplicacion.setVisible(true);    
+        }catch(Exception e){
+            System.out.println(e);
+        }
     }   
 }

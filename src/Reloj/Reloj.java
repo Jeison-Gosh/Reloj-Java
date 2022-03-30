@@ -14,12 +14,13 @@ public class Reloj implements Runnable {
     @Override
     
     public void run(){
+        String horaActual = "";
         while(true){
-            String horaActual = getTime();
+            horaActual = getTime();
             if(formato){
-                Main.aplicacion.clock1.setText(horaActual);
+               Componentes.clock1.setText(horaActual);
             }else{
-                Main.aplicacion.clock2.setText(horaActual);
+               Componentes.clock2.setText(horaActual);
             }
             try {
                 Thread.sleep(1000);

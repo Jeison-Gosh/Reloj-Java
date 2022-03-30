@@ -34,7 +34,7 @@ public class ListaAlarmas extends JFrame {
         this.add(InputPanel);
     }
     public void addAlarm(AlarmaGrafica AG){
-        if(Main.aplicacion.alarm_list.isEmpty()){
+        if(Componentes.alarm_list.isEmpty()){
             coordinateX=50;
             coordinateY=30;
             AG.setLocation(coordinateX,coordinateY);
