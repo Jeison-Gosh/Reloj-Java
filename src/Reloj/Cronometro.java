@@ -3,36 +3,36 @@ package Reloj;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Temporizador implements Runnable {
+public class Cronometro implements Runnable {
     
     private static int d,h,m,s;
     private static boolean stop;
     private static String dd,hh,mm,ss,stopWatch;
 
-    public Temporizador(){
+    public Cronometro(){
         
-        Temporizador.stop = false;
-        Temporizador.stopWatch = "";
-        Temporizador.ss = "";
-        Temporizador.mm = "";
-        Temporizador.hh = "";
-        Temporizador.dd = "";
-        Temporizador.d = 0;
-        Temporizador.h = 0;
-        Temporizador.m = 0;
-        Temporizador.s = 0;
+        Cronometro.stop = false;
+        Cronometro.stopWatch = "";
+        Cronometro.ss = "";
+        Cronometro.mm = "";
+        Cronometro.hh = "";
+        Cronometro.dd = "";
+        Cronometro.d = 0;
+        Cronometro.h = 0;
+        Cronometro.m = 0;
+        Cronometro.s = 0;
     }
     @Override
     
     public void run() {
         while(true){
             if(stop==false){
-                Main.aplicacion.timer.setText(chronometer());
+                Main.aplicacion.chronometer.setText(chronometer());
             }   
             try {
                  Thread.sleep(1000);
             } catch (InterruptedException ex) {
-                Logger.getLogger(Temporizador.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Cronometro.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -61,10 +61,10 @@ public class Temporizador implements Runnable {
         return stopWatch;
     }
     public static void Stop(){
-        Temporizador.stop=true;
+        Cronometro.stop=true;
     }
     public static void Resume(){
-        Temporizador.stop=false;
+        Cronometro.stop=false;
     }
     public static void Reset(){
         s=0;
@@ -75,7 +75,7 @@ public class Temporizador implements Runnable {
         mm="";
         hh="";
         dd="";
-        Main.aplicacion.timer.setText("00:00:00:00");
+        Main.aplicacion.chronometer.setText("00:00:00:00");
     }
     private String parseToString(int valor){
         String string_valor;

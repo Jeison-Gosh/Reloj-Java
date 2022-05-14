@@ -7,7 +7,7 @@ import javax.swing.border.LineBorder;
 
 public class ListaAlarmas extends JFrame {
     
-    private int coordinateX, coordinateY, accountant=0;
+    private int coordinateX=30, coordinateY=10, accountant=0;
     private JPanel InputPanel;
     
     public ListaAlarmas(){
@@ -29,36 +29,38 @@ public class ListaAlarmas extends JFrame {
         InputPanel.setLocation(0,0);
         InputPanel.setSize(500,500);
         InputPanel.setLayout(null);
-        InputPanel.setBackground(Color.decode("#0B0705"));
+        InputPanel.setBackground(Color.decode("#202225"));
         InputPanel.setBorder(new LineBorder(new Color(72,71,73)));
         this.add(InputPanel);
     }
     public void addAlarm(AlarmaGrafica AG){
-        if(Componentes.alarm_list.isEmpty()){
-            coordinateX=50;
-            coordinateY=30;
-            AG.setLocation(coordinateX,coordinateY);
-            accountant++;
-        }else{
-            switch (accountant) {
-                case 0:
-                    AG.setLocation(50,coordinateY);
-//                    System.out.println("es el 0");
-                    accountant++;
-                    break;
-                case 1:
-                    AG.setLocation(200,coordinateY);
-//                    System.out.println("es el 1");
-                    accountant++;
-                    break;
-                case 2:
-                    AG.setLocation(350,coordinateY);
-//                    System.out.println("es el 2");
-                    coordinateY+=130;
-                    accountant=0;
-                    break;
-            }
+        AG.setLocation(coordinateX,coordinateY);
+        String condition=AG.getDay();
+        switch(condition){
+            case "Domingo":
+                AG.setBackground(Color.decode("#610404"));
+                break;
+            case "Lunes":
+                AG.setBackground(Color.decode("#5C6104"));
+                break;
+            case "Martes":
+                AG.setBackground(Color.decode("#046122"));
+                break;
+            case "Miercoles":
+                AG.setBackground(Color.decode("#045F61"));
+                break;
+            case "Jueves":
+              AG.setBackground(Color.decode("#041161"));
+                break;
+            case "Viernes":
+                AG.setBackground(Color.decode("#250461"));
+                break;
+            case "Sabado":
+                AG.setBackground(Color.decode("#61045B"));
+                break;
         }
+        coordinateY+=65;
+        accountant++;
         AG.setVisible(true);
         InputPanel.add(AG);
     }

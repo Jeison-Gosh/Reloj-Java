@@ -14,7 +14,7 @@ public class Mensaje extends JFrame {
     public JPanel panel;
     private JLabel message,botonSalir;
     
-    public Mensaje(){
+    public Mensaje(String mensaje){
         InitComponents();
         setFocusableWindowState(false);
         setAlwaysOnTop(true);
@@ -23,6 +23,7 @@ public class Mensaje extends JFrame {
         setUndecorated(true);
         setTitle("Mensaje");
         setLocationRelativeTo(null);
+        message.setText(mensaje);
     }
 
     public JPanel getPanel() {
@@ -36,7 +37,7 @@ public class Mensaje extends JFrame {
     private void Panel(){
         panel = new JPanel();
         panel.setSize(330,100);
-        panel.setBackground(Color.decode("#0B0705"));
+        panel.setBackground(Color.decode("#202225"));
         panel.setLayout(null);
         panel.setBorder(new LineBorder(new Color(62,60,63)));
         add(panel);
