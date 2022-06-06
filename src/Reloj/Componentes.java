@@ -29,7 +29,6 @@ import javax.swing.border.LineBorder;
 
 public class Componentes extends JFrame {
     
-    private ListaAlarmas list_of_alarms;
     private JPanel MainPanel;
     private JLabel alarmButton, chronometerButton, clockButton, exitButton, minimizeButton, backgroundButton;
     private JLabel alarmPickDay, alarmPickHour, alarmPickMinute, alarmPickMeridian, alarmTwoPointsMeridian, alarmScheduleButton;
@@ -39,18 +38,19 @@ public class Componentes extends JFrame {
     private SystemTray systemtray;
     private Runnable chronometer_runnable, clock1_runnable, clock2_runnable;
     private int alarm_day_count, alarm_hour_count, alarm_minute_count;
-    private boolean clock_format_status, clock_default_color_buttons=true, alarmStatusMeridian=true, alarmListIsEmpity=true;
+    private boolean clock_format_status, clock_default_color_buttons=true, alarmStatusMeridian=true;
     private boolean chronometer_default_startstopbutton=true, chronometer_default_resetbutton=false, chronometer_thread_is_not_start=true;
-    private Mensaje_de_Ayuda Help_Message=null;
+    private MensajeDeAyuda Help_Message=null;
     private String []Smins, Shours, Sdays;
     private Integer []mins, hours;
+    public static ListaAlarmas list_of_alarms;
+    public static JLabel clock1, clock2;
     public static LinkedList<Alarma> alarm_list;
+    public int alarmThread_count;
     public LinkedList<Thread> alarm_list_thread;
     public JLabel alarm, alarmShowListButton, alarmRoundedBorder, clock_button_12h, clock_button_24h;
-    public JLabel chronometer, timer_image, chronometer_reset_button, chronometer_start_stop_button, chronometer_dhms;
-    public static JLabel clock1, clock2;
+    public JLabel chronometer, chronometer_reset_button, chronometer_start_stop_button, chronometer_dhms;
     public JTextField alarmGetNameJTextField;
-    public int alarm_counter;
     
 
     public Componentes(){
@@ -81,7 +81,7 @@ public class Componentes extends JFrame {
         Clock_Interface();
         
         //creacion y activacion de hilos
-        activeTimer_Threads();
+        activeChronometer_Threads();
         activeClock_Threads();
         
 //        watchLayouts();
@@ -89,7 +89,6 @@ public class Componentes extends JFrame {
     private void InputPanel(){
         MainPanel=new JPanel();
         MainPanel.setSize(500,500);
-//        MainPanel.setBackground(Color.decode("#0B0705"));
         MainPanel.setBackground(Color.decode("#202225"));
         MainPanel.setLayout(null);
         MainPanel.setBorder(new LineBorder(new Color(72,71,73)));
@@ -105,7 +104,6 @@ public class Componentes extends JFrame {
         exitButton.setHorizontalAlignment(SwingConstants.CENTER);
         exitButton.setVerticalAlignment(SwingConstants.CENTER);
         exitButton.setBounds(475,4,18,26);
-//        exitButton.setOpaque(true);
         mouseListenerExitButton();
         MainPanel.add(exitButton);
     }
@@ -117,7 +115,6 @@ public class Componentes extends JFrame {
         minimizeButton.setHorizontalAlignment(SwingConstants.CENTER);
         minimizeButton.setVerticalAlignment(SwingConstants.CENTER);
         minimizeButton.setSize(18,26);
-//        minimizeButton.setOpaque(true);
         mouseListenerMinimizeButton();
         MainPanel.add(minimizeButton);
         
@@ -131,7 +128,6 @@ public class Componentes extends JFrame {
         backgroundButton.setHorizontalAlignment(SwingConstants.CENTER);
         backgroundButton.setVerticalAlignment(SwingConstants.CENTER);    
         backgroundButton.setSize(18,26);
-//        backgroundButton.setOpaque(true);
         mouseListenerBackgroundButton();
         MainPanel.add(backgroundButton);
     }
@@ -151,7 +147,7 @@ public class Componentes extends JFrame {
        chronometerButton.setBounds(177,425,165,25);
        chronometerButton.setForeground(Color.cyan);
        chronometerButton.setHorizontalAlignment(SwingConstants.CENTER);
-       mouseListenerTimerButton();
+       mouseListenerChronometerButton();
        MainPanel.add(chronometerButton);
     }
     private void Clock_Button(){
@@ -181,16 +177,16 @@ public class Componentes extends JFrame {
         alarmGetNameJTextField=new JTextField("Nombre de la Alarma");        
         alarmTwoPointsMeridian=new JLabel(":");
         alarmScheduleButton=new JLabel("PROGRAMAR");
-        alarmShowListButton=new JLabel("MOSTRAR ALARMAS");
+        alarmShowListButton=new JLabel("Mostrar Alarmas");
         alarmRoundedBorder=new JLabel();
         alarmPickMeridian=new JLabel("A.M");
         alarmPickMinute=new JLabel(Smins[0]);
         alarmPickHour=new JLabel(Shours[5]);
         alarmPickDay=new JLabel(Sdays[1]);
-        alarm_counter=0;
         alarm_day_count=1;
         alarm_hour_count=5;
         alarm_minute_count=0;
+        alarmThread_count=0;
         
         //get name JTextField
         alarmGetNameJTextField.setBounds(130, 115, 240, 30);
@@ -199,7 +195,6 @@ public class Componentes extends JFrame {
         alarmGetNameJTextField.setForeground(Color.decode("#808080"));
         alarmGetNameJTextField.setBackground(Color.decode("#393939"));
         alarmGetNameJTextField.setCaretColor(Color.decode("#808080"));
-//        alarmGetNameJTextField.setFocusAccelerator('n');
         alarmGetNameJTextField.setBorder(new LineBorder(Color.decode("#393939"), 1, true));
         alarmGetNameJTextField.setToolTipText("Etiqueta de la alarma");
         alarmGetNameJTextField.setHorizontalAlignment(SwingConstants.CENTER);
@@ -231,9 +226,8 @@ public class Componentes extends JFrame {
         //showList Button
         alarmShowListButton.setBounds(185,320,130,22);
         alarmShowListButton.setOpaque(true);
-        alarmShowListButton.setFont(new Font("Verdana",1,10));
+        alarmShowListButton.setFont(new Font("Segoe UI",1,13));
         alarmShowListButton.setForeground(Color.decode("#9F6469"));
-//        alarmShowListButton.setBackground(Color.decode("#454546"));
         alarmShowListButton.setHorizontalAlignment(SwingConstants.CENTER);
         alarmShowListButton.setBorder(new LineBorder(Color.decode("#8A8D8F")));
         mouseListenerAlarmShowListButton();
@@ -254,6 +248,7 @@ public class Componentes extends JFrame {
         alarmPickHour.setBounds(195,200,60,45);
         alarmPickHour.setFont(new Font("Verdana",1,40));
         alarmPickHour.setForeground(Color.decode("#C1DEDD"));
+        alarmPickHour.setToolTipText("Digite con el teclado la hora de la alarma.");
         alarmPickHour.setHorizontalAlignment(SwingConstants.CENTER);
         alarmPickHour.setVisible(false);
         mouseListenerAlarmPickHour();
@@ -272,6 +267,7 @@ public class Componentes extends JFrame {
         alarmPickMinute.setBounds(285,200,60,45);
         alarmPickMinute.setFont(new Font("Verdana",1,40));
         alarmPickMinute.setForeground(Color.decode("#C1DEDD"));
+        alarmPickMinute.setToolTipText("Digite con el teclado los minutos de la alarma.");
         alarmPickMinute.setHorizontalAlignment(SwingConstants.CENTER);
         alarmPickMinute.setVisible(false);
         mouseListenerAlarmPickMinute();
@@ -413,7 +409,7 @@ public class Componentes extends JFrame {
     }
     
     //activacion de Threads
-    private void activeTimer_Threads(){
+    private void activeChronometer_Threads(){
         chronometer_runnable=new Cronometro();
         chronometer_thread=new Thread(chronometer_runnable);
     }
@@ -821,32 +817,28 @@ public class Componentes extends JFrame {
     }
     private void mouseListenerExitButton(){
         MouseListener botoncierrre;
-        botoncierrre = new MouseListener() {
+        botoncierrre = new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent me) {
-//                SoundBubble();
-                System.exit(0);
+                if(alarm_list.isEmpty()){
+                    System.exit(0);
+                }else{
+                    Mensaje m = new Mensaje("Se han desactivado las alarmas.");
+                    m.setVisible(true);
+                }
             }
-//605 3605274 - 1145
             @Override
             public void mousePressed(MouseEvent me) {
                 exitButton.setForeground(Color.RED);
                 exitButton.setFont(new Font("Spectral",1,27));
-//                if(Help_Message==null) Help_Message=new Mensaje_de_Ayuda("Cerrar");
-//                if(!Help_Message.isVisible()) Help_Message.setVisible(true);
-                Mensaje m=new Mensaje("Desea Cerrar");
-                m.setVisible(true);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent me) {
+                
             }
 
             @Override
             public void mouseEntered(MouseEvent me) {
                 exitButton.setForeground(Color.decode("#ff0000"));
                 exitButton.setFont(new Font("Spectral",1,25));
-                if(Help_Message==null) Help_Message=new Mensaje_de_Ayuda("Cerrar");
+                if(Help_Message==null) Help_Message=new MensajeDeAyuda("Cerrar");
                 if(!Help_Message.isVisible()) Help_Message.setVisible(true);
                 
             }
@@ -882,7 +874,7 @@ public class Componentes extends JFrame {
             @Override
             public void mouseEntered(MouseEvent me) {
                 minimizeButton.setForeground(Color.decode("#ffeb00"));
-                Help_Message=new Mensaje_de_Ayuda("Minimizar");
+                Help_Message=new MensajeDeAyuda("Minimizar");
                 if(!Help_Message.isVisible()) Help_Message.setVisible(true);
                 
             }
@@ -923,7 +915,7 @@ public class Componentes extends JFrame {
             @Override
             public void mouseEntered(MouseEvent me) {
                 backgroundButton.setForeground(Color.LIGHT_GRAY);
-                Help_Message=new Mensaje_de_Ayuda("Segundo Plano");
+                Help_Message=new MensajeDeAyuda("Segundo Plano");
                 if(!Help_Message.isVisible()) Help_Message.setVisible(true);
             }
 
@@ -983,7 +975,7 @@ public class Componentes extends JFrame {
         };
         alarmButton.addMouseListener(MLalarmL);
     }
-    private void mouseListenerTimerButton(){
+    private void mouseListenerChronometerButton(){
         MouseListener MLtimerL=new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent me) {
@@ -1029,7 +1021,6 @@ public class Componentes extends JFrame {
         chronometerButton.addMouseListener(MLtimerL);
     }
     private void mouseListenerClockButton(){
-        
         MouseListener MLclockL=new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent me) {
@@ -1092,15 +1083,6 @@ public class Componentes extends JFrame {
                     alarm_day_count=0;
                     alarmPickDay.setText(Sdays[alarm_day_count]);
                 }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent me) {
-                
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent me) {
             }
 
             @Override
@@ -1191,11 +1173,15 @@ public class Componentes extends JFrame {
         MouseListener alarmschedulebutton = new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent me) {
-                if(alarmStatusMeridian){
-                    Alarma alarma=new Alarma(alarmGetNameJTextField.getText(),Sdays[alarm_day_count],hours[alarm_hour_count],mins[alarm_minute_count]);
+                alarmThread_count++;
+                if(alarmThread_count<=7){
+                    Alarma alarma;
+                    if(alarmStatusMeridian) alarma=new Alarma(alarmGetNameJTextField.getText(),Sdays[alarm_day_count],hours[alarm_hour_count],mins[alarm_minute_count]);
+                    else alarma=new Alarma(alarmGetNameJTextField.getText(),Sdays[alarm_day_count],hours[alarm_hour_count+12],mins[alarm_minute_count]);
+                    
+                    Alarma.setCount(alarmThread_count);
                     Thread alarma_Thread=new Thread(alarma,alarma.getAlarmName());
                     alarma_Thread.start();
-                    alarm_counter++;
                     alarm_list.add(alarma);
                     alarm_list_thread.add(alarma_Thread);
                     list_of_alarms.addAlarm(new AlarmaGrafica(alarma.getAlarmName(),alarma.getTime(),alarma.getDay()));
@@ -1203,19 +1189,21 @@ public class Componentes extends JFrame {
                     Mensaje m=new Mensaje("La alarma se ha programado");
                     m.setVisible(true); 
                 }else{
-                    Alarma alarma=new Alarma(alarmGetNameJTextField.getText(),Sdays[alarm_day_count],hours[alarm_hour_count+12],mins[alarm_minute_count]);
-                    Thread alarma_Thread=new Thread(alarma,alarma.getAlarmName());
-                    alarma_Thread.start();
-                    alarm_counter++;
-                    alarm_list.add(alarma);
-                    alarm_list_thread.add(alarma_Thread);
-                    list_of_alarms.addAlarm(new AlarmaGrafica(alarma.getAlarmName(),alarma.getTime(),alarma.getDay()));
-                    alarmShowListButton.setEnabled(true);
-                    Mensaje m=new Mensaje("La alarma se ha programado");
-                    m.setVisible(true); 
+                    if(Alarma.getCount()==7){
+                        Mensaje m=new Mensaje("Posee suficientes alarmas programadas");
+                        m.setVisible(true);                        
+                    }else{
+                        alarmThread_count=6;
+                        mouseClicked(me);
+                    }
                 }
-                if(!alarm_list_thread.isEmpty() || alarm_list.isEmpty()) alarmShowListButton.setForeground(Color.decode("#E3242B"));
-                else alarmShowListButton.setForeground(Color.decode("#9F6469"));
+                if(!alarm_list_thread.isEmpty() || !alarm_list.isEmpty()){
+                    alarmShowListButton.setForeground(Color.decode("#E3242B"));
+                    alarmShowListButton.setEnabled(true);
+                }else{ 
+                    alarmShowListButton.setForeground(Color.decode("#9F6469"));
+                    alarmShowListButton.setEnabled(false);
+                }
             }
 
             @Override
@@ -1238,21 +1226,6 @@ public class Componentes extends JFrame {
                 else list_of_alarms.setVisible(true);
             }
 
-            @Override
-            public void mousePressed(MouseEvent me) {
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent me) {
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent me) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent me) {
-            }
         };
         
         alarmShowListButton.addMouseListener(showlistbutton);
@@ -1430,7 +1403,7 @@ public class Componentes extends JFrame {
     }
     
     private void watchLayouts(){
-//        alarm.setOpaque(true);
+        alarm.setOpaque(true);
         alarmButton.setOpaque(true);
         alarmPickDay.setOpaque(true);
         alarmPickHour.setOpaque(true);

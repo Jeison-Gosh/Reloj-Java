@@ -8,52 +8,62 @@ import java.util.ListIterator;
 
 public class Alarma implements Runnable{
 
-    private static long counter;
-    private boolean AlarmIsOn;
+    private static int count;
+    private boolean isAlarmOn;
     private final int hour;
     private final int min;
     private final String day;
-    private final String AlarmName;
+    private final String alarmName;
     private Calendar calendar;
+    private SClip alarmClockSound;
+
     
     public Alarma(String AlarmName, String day, int hour, int min) {
-        Alarma.counter = 0;
-        this.AlarmName = AlarmName;
+        Alarma.count = Alarma.count;
+        this.alarmName = AlarmName;
         this.day = day;
         this.hour = hour;
         this.min = min;
-        this.AlarmIsOn = true;
+        this.isAlarmOn = true;
+        this.alarmClockSound=new SClip("src/sounds/alarmClock.wav");
+
     }
     
     @Override
     public void run() {
-        while(AlarmIsOn){
+        while(isAlarmOn){
             if(check_day() && check_time()){
                 run_alarm();
             }else{
                 try{
                     Thread.sleep(getDiff());
-                }catch (Exception e){}
+                }catch (Exception e){
+                    System.out.println("un error ha ocurrido");
+                }
             }
         }
     }
 
     @Override
     public String toString(){
-        String string=this.AlarmName+" "+this.day+" "+this.hour+" "+this.min;
+        String string=this.alarmName+" "+this.day+" "+this.hour+" "+this.min;
         return string;
     }
     public void cancel_alarm(){
-        this.AlarmIsOn = false;
+        this.isAlarmOn = false;
     }
-    public String getCode(){
-        return AlarmName+day+hour+min;
+    public boolean isAlarmOn(){
+        return this.isAlarmOn;
     }
-    public String getAlarmName(){
-        return this.AlarmName;
+    public static void setCount(int count){
+        if(count<=7 && count>=1){
+            Alarma.count = count;
+        }else{
+            Alarma.count = 1;
+        }
     }
-    public String getDay(){
-        return day; 
+    public static int getCount(){
+        return Alarma.count;
     }
     public int getHour() {
         return hour;
@@ -61,12 +71,21 @@ public class Alarma implements Runnable{
     public int getMin() {
         return min;
     }
+    public String getDay(){
+        return day; 
+    }
     public String getTime(){
         if(min<10){
             return hour+":"+"0"+min;
         }else{
             return hour+":"+min;
         }
+    }
+    public String getCode(){
+        return alarmName+day+hour+min;
+    }
+    public String getAlarmName(){
+        return this.alarmName;
     }
     
     private String getToday(){
@@ -100,7 +119,6 @@ public class Alarma implements Runnable{
             min=calendar.get(Calendar.MINUTE)*60000;
             diff=hour-min;
         }
-        System.out.println("la diferencia de tiempo es: "+diff);
         return diff;
     }
     private boolean check_day(){
@@ -120,34 +138,27 @@ public class Alarma implements Runnable{
         }
         return is_the_time;
     }
-    
     private synchronized void run_alarm (){
-        if(check_day() && check_time()){
-            System.out.println("Alarma esta sonando");
-            System.out.println("Alarma esta sonando");
-            System.out.println("Alarma esta sonando");
-            System.out.println("Alarma esta sonando");
-            AlarmIsOn=false;            
+        if(check_day() && check_time() && count<=7){
+            alarmClockSound.play();
+            isAlarmOn=false;  
+            count--;
             ListIterator<Thread> itt=Main.aplicacion.alarm_list_thread.listIterator();
             ListIterator<Alarma> ita=Main.aplicacion.alarm_list.listIterator();
             while(itt.hasNext() && ita.hasNext()){
                 Alarma a=ita.next();
-                itt.next();
-                if(!a.AlarmIsOn && !a.getCode().equals(this.getCode())){
+                Thread t=itt.next();
+                if(!a.isAlarmOn && !a.getCode().equals(this.getCode())){
                     ita.remove();
                     itt.remove();
                 }
             }
+            //menor o igual a uno, porque no se puede eliminar un hilo en ejecucion.
             if(Main.aplicacion.alarm_list.size()<=1){ 
                 Main.aplicacion.alarmShowListButton.setForeground(Color.decode("#9F6469"));
                 Main.aplicacion.alarmShowListButton.setEnabled(false);
-                
             }
-            
-            System.out.println("asi quedo la lista T: ");
-            for(Thread t: Main.aplicacion.alarm_list_thread){
-                System.out.print(" "+t+" ");
-            }
+            Main.aplicacion.list_of_alarms.rebuildGraphicalList();
         }
         
     }

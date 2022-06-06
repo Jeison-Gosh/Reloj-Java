@@ -1,18 +1,18 @@
 package Reloj;
 
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.lang.InterruptedException;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 public class Reloj implements Runnable {
     
-    public boolean formato; 
+    private boolean formato; 
     
     public Reloj(boolean formato){
         this.formato=formato;   
     }
-    @Override
     
+    @Override
     public void run(){
         String horaActual = "";
         while(true){
@@ -25,7 +25,7 @@ public class Reloj implements Runnable {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
-                Logger.getLogger(Reloj.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("--[Exepcion ubicada en clase Reloj]\n\n"+ex);
             }
         }
     }

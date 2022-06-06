@@ -33,7 +33,7 @@ public class AlarmaGrafica extends JPanel {
     public String getDay() {
         return day;
     }
-    public void putLabels(){
+    private void putLabels(){
         JLabel title=new JLabel(this.title);
         JLabel time=new JLabel(this.time);
         JLabel day=new JLabel("• "+this.day+" •");

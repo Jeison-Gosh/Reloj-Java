@@ -9,11 +9,11 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 
-public class Mensaje_de_Ayuda extends JFrame {
+public class MensajeDeAyuda extends JFrame {
     
     private final JLabel MESSAGE;
     
-    public Mensaje_de_Ayuda(String message){
+    public MensajeDeAyuda(String message){
         this.setLocation(MouseInfo.getPointerInfo().getLocation());
         this.setUndecorated(true);
         this.setSize(message.length()*6,20);
