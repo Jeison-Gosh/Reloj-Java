@@ -7,7 +7,7 @@ public class Main {
     public static void main(String[] args) {
         try{
             aplicacion=new Componentes();
-            aplicacion.setVisible(true);    
+            aplicacion.setVisible(true); 
         }catch(Exception e){
             System.out.println(e);
         }

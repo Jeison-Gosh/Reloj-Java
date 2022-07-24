@@ -46,10 +46,11 @@ public class Componentes extends JFrame {
     public static ListaAlarmas list_of_alarms;
     public static JLabel clock1, clock2;
     public static LinkedList<Alarma> alarm_list;
+    public static JLabel chronometer;
     public int alarmThread_count;
     public LinkedList<Thread> alarm_list_thread;
     public JLabel alarm, alarmShowListButton, alarmRoundedBorder, clock_button_12h, clock_button_24h;
-    public JLabel chronometer, chronometer_reset_button, chronometer_start_stop_button, chronometer_dhms;
+    public JLabel  chronometer_reset_button, chronometer_start_stop_button, chronometer_dhms;
     public JTextField alarmGetNameJTextField;
     
 
@@ -144,7 +145,7 @@ public class Componentes extends JFrame {
     private void Chronometer_Button(){
        chronometerButton=new JLabel("Cronometro");
        chronometerButton.setFont(new Font("Segoe Print",1,18));
-       chronometerButton.setBounds(177,425,165,25);
+       chronometerButton.setBounds(170,425,160,25);
        chronometerButton.setForeground(Color.cyan);
        chronometerButton.setHorizontalAlignment(SwingConstants.CENTER);
        mouseListenerChronometerButton();
@@ -155,7 +156,7 @@ public class Componentes extends JFrame {
         clockButton.setFont(new Font("Segoe Print",1,15));
         clockButton.setForeground(Color.gray);
         clockButton.setHorizontalAlignment(SwingConstants.CENTER);
-        clockButton.setBounds(410,425,43,25);
+        clockButton.setBounds(380,425,70,25);
         mouseListenerClockButton();
         MainPanel.add(clockButton);
     }
@@ -236,7 +237,7 @@ public class Componentes extends JFrame {
         
         //pickDay Button
         alarmPickDay.setBounds(30,205,160,35);
-        alarmPickDay.setFont(new Font("Verdana",1,30));
+        alarmPickDay.setFont(new Font("Verdana",1,28));
         alarmPickDay.setForeground(new Color(124,242,224));
         alarmPickDay.setHorizontalAlignment(SwingConstants.CENTER);
         alarmPickDay.setVisible(false);
@@ -246,7 +247,7 @@ public class Componentes extends JFrame {
         
         //pickHour 
         alarmPickHour.setBounds(195,200,60,45);
-        alarmPickHour.setFont(new Font("Verdana",1,40));
+        alarmPickHour.setFont(new Font("Verdana",1,38));
         alarmPickHour.setForeground(Color.decode("#C1DEDD"));
         alarmPickHour.setToolTipText("Digite con el teclado la hora de la alarma.");
         alarmPickHour.setHorizontalAlignment(SwingConstants.CENTER);
@@ -265,7 +266,7 @@ public class Componentes extends JFrame {
         
         //pickMinute 
         alarmPickMinute.setBounds(285,200,60,45);
-        alarmPickMinute.setFont(new Font("Verdana",1,40));
+        alarmPickMinute.setFont(new Font("Verdana",1,38));
         alarmPickMinute.setForeground(Color.decode("#C1DEDD"));
         alarmPickMinute.setToolTipText("Digite con el teclado los minutos de la alarma.");
         alarmPickMinute.setHorizontalAlignment(SwingConstants.CENTER);
@@ -276,7 +277,7 @@ public class Componentes extends JFrame {
         
         //pickMeridian Button
         alarmPickMeridian.setBounds(355,210,40,35);
-        alarmPickMeridian.setFont(new Font("Times",1,22));
+        alarmPickMeridian.setFont(new Font("Times",1,20));
         alarmPickMeridian.setForeground(Color.decode("#9C33FF"));
         alarmPickMeridian.setHorizontalAlignment(SwingConstants.CENTER);
         alarmPickMeridian.setVisible(false);
@@ -1107,7 +1108,7 @@ public class Componentes extends JFrame {
             @Override
             public void mouseEntered(MouseEvent me) {
                 alarmPickHour.grabFocus();
-                alarmPickHour.setFont(new Font("Verdana",1,42));
+                alarmPickHour.setFont(new Font("Verdana",1,40));
                 alarmPickHour.setForeground(Color.decode("#C1DEFF"));
                 if(alarmGetNameJTextField.getText().equals("")){
                     alarmGetNameJTextField.setText("Nombre de la Alarma");
@@ -1129,7 +1130,7 @@ public class Componentes extends JFrame {
             @Override
             public void mouseEntered(MouseEvent me) {
                 alarmPickMinute.grabFocus();
-                alarmPickMinute.setFont(new Font("Verdana",1,42));
+                alarmPickMinute.setFont(new Font("Verdana",1,40));
                 alarmPickMinute.setForeground(Color.decode("#C1DEFF"));
                 if(alarmGetNameJTextField.getText().equals("")){
                     alarmGetNameJTextField.setText("Nombre de la Alarma");
@@ -1156,6 +1157,7 @@ public class Componentes extends JFrame {
                     alarmPickMeridian.setText("A.M");
                 }
             }
+            @Override
             public void mouseEntered(MouseEvent me){
                 alarmPickMeridian.grabFocus();
                 alarmPickMeridian.setForeground(Color.decode("#BB33FF"));
@@ -1163,6 +1165,7 @@ public class Componentes extends JFrame {
                     alarmGetNameJTextField.setText("Nombre de la Alarma");
                 }
             }
+            @Override
             public void mouseExited(MouseEvent me){
                 alarmPickMeridian.setForeground(Color.decode("#9C33FF"));
             }
@@ -1278,7 +1281,7 @@ public class Componentes extends JFrame {
             @Override
             public void mouseEntered(MouseEvent me) {
                 if(chronometer_default_resetbutton && !"00:00:00:00".equals(chronometer.getText()) ){
-                    chronometer_reset_button.setFont(new Font("Times",1,24));
+                    chronometer_reset_button.setFont(new Font("Times",1,22));
                     chronometer_reset_button.setForeground(new Color(213,51,255));
                 }
             }
@@ -1319,7 +1322,7 @@ public class Componentes extends JFrame {
             @Override
             public void mouseEntered(MouseEvent me) {
                 if(chronometer_default_startstopbutton){
-                    chronometer_start_stop_button.setFont(new Font("Times",1,24));
+                    chronometer_start_stop_button.setFont(new Font("Times",1,22));
                     chronometer_start_stop_button.setForeground(new Color(213,51,255));
                 }
             }
@@ -1403,7 +1406,8 @@ public class Componentes extends JFrame {
     }
     
     private void watchLayouts(){
-        alarm.setOpaque(true);
+        try{
+//        alarm.setOpaque(true);
         alarmButton.setOpaque(true);
         alarmPickDay.setOpaque(true);
         alarmPickHour.setOpaque(true);
@@ -1425,7 +1429,9 @@ public class Componentes extends JFrame {
         exitButton.setOpaque(true);
         minimizeButton.setOpaque(true);
         backgroundButton.setOpaque(true);
-        
+        }catch(Exception e){
+            System.out.println(e);
+        }
         
     }
     

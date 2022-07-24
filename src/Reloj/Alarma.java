@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.ListIterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class Alarma implements Runnable{
@@ -37,8 +39,8 @@ public class Alarma implements Runnable{
             }else{
                 try{
                     Thread.sleep(getDiff());
-                }catch (Exception e){
-                    System.out.println("un error ha ocurrido");
+                }catch (InterruptedException ex){
+                   Logger.getLogger(Alarma.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
