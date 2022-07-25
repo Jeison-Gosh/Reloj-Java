@@ -17,6 +17,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -44,13 +45,12 @@ public class Componentes extends JFrame {
     private String []Smins, Shours, Sdays;
     private Integer []mins, hours;
     public static ListaAlarmas list_of_alarms;
-    public static JLabel clock1, clock2;
+    public static JLabel clock1, clock2, chronometer;
     public static LinkedList<Alarma> alarm_list;
-    public static JLabel chronometer;
+    public static LinkedList<Thread> alarm_list_thread;
     public int alarmThread_count;
-    public LinkedList<Thread> alarm_list_thread;
     public JLabel alarm, alarmShowListButton, alarmRoundedBorder, clock_button_12h, clock_button_24h;
-    public JLabel  chronometer_reset_button, chronometer_start_stop_button, chronometer_dhms;
+    public JLabel chronometer_reset_button, chronometer_start_stop_button, chronometer_dhms;
     public JTextField alarmGetNameJTextField;
     
 
@@ -1175,7 +1175,7 @@ public class Componentes extends JFrame {
     private void mouseListenerAlarmScheduleButton(){
         MouseListener alarmschedulebutton = new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent me) {
+            public void mousePressed(MouseEvent me) {
                 alarmThread_count++;
                 if(alarmThread_count<=7){
                     Alarma alarma;
@@ -1197,7 +1197,7 @@ public class Componentes extends JFrame {
                         m.setVisible(true);                        
                     }else{
                         alarmThread_count=6;
-                        mouseClicked(me);
+                        mousePressed(me);
                     }
                 }
                 if(!alarm_list_thread.isEmpty() || !alarm_list.isEmpty()){
@@ -1224,9 +1224,21 @@ public class Componentes extends JFrame {
     private void mouseListenerAlarmShowListButton(){
         MouseListener showlistbutton = new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent me) {
-                if(alarm_list_thread.isEmpty()) list_of_alarms.setVisible(false);
-                else list_of_alarms.setVisible(true);
+                public void mousePressed(MouseEvent me) {
+                    System.out.println("size l threads "+alarm_list_thread.size()+" --- size l alarms " +alarm_list.size());
+                    if(alarm_list_thread.isEmpty()){
+                        list_of_alarms.setVisible(false);
+                    }else if(alarm_list_thread.size()==1){
+                        ListIterator<Alarma> LIalt=alarm_list.listIterator();
+                        Alarma a=LIalt.next();
+                        if(!a.isAlarmOn()){
+                            list_of_alarms.setVisible(false);
+                        }else{
+                            list_of_alarms.setVisible(true);
+                        }
+                    }else{
+                        list_of_alarms.setVisible(true);
+                    }
             }
 
         };
@@ -1235,6 +1247,7 @@ public class Componentes extends JFrame {
     }
     private void mouseListenerAlarmGetNameJTextField(){
         MouseListener MA = new MouseAdapter() {
+            @Override
             public void mouseClicked(MouseEvent e){
                 alarmGetNameJTextField.setFocusable(true);
                 alarmGetNameJTextField.grabFocus();
@@ -1246,7 +1259,7 @@ public class Componentes extends JFrame {
                 alarmGetNameJTextField.setFocusable(true);
                 if(alarmGetNameJTextField.getText().equals("Nombre de la Alarma")){
                     alarmGetNameJTextField.setText("");
-                alarmGetNameJTextField.setCaretPosition(0);
+                    alarmGetNameJTextField.setCaretPosition(0);
                 }
             }
             

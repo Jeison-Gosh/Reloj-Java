@@ -3,8 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/USUARIO/Documents/NetBeansProjects/Reloj-Java/src/Reloj/Main.java</file>
+            <file>file:/D:/USUARIO/Documents/NetBeansProjects/Reloj-Java/src/Reloj/Alarma.java</file>
             <file>file:/D:/USUARIO/Documents/NetBeansProjects/Reloj-Java/src/Reloj/Componentes.java</file>
+            <file>file:/D:/USUARIO/Documents/NetBeansProjects/Reloj-Java/src/Reloj/ListaAlarmas.java</file>
+            <file>file:/D:/USUARIO/Documents/NetBeansProjects/Reloj-Java/src/Reloj/AlarmaGrafica.java</file>
         </group>
     </open-files>
 </project-private>

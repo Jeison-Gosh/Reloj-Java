@@ -27,7 +27,7 @@ public class Cronometro implements Runnable {
     public void run() {
         while(true){
             if(stop==false){
-                Main.aplicacion.chronometer.setText(chronometer());
+                Componentes.chronometer.setText(chronometer());
             }   
             try {
                  Thread.sleep(1000);
@@ -75,7 +75,7 @@ public class Cronometro implements Runnable {
         mm="";
         hh="";
         dd="";
-        Main.aplicacion.chronometer.setText("00:00:00:00");
+        Componentes.chronometer.setText("00:00:00:00");
     }
     private String parseToString(int valor){
         String string_valor;

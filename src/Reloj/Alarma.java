@@ -9,25 +9,29 @@ import java.util.logging.Logger;
 
 
 public class Alarma implements Runnable{
-
+    
+    private static long uniqueCode = 0;
     private static int count;
-    private boolean isAlarmOn;
     private final int hour;
     private final int min;
     private final String day;
     private final String alarmName;
+    private boolean isAlarmOn;
     private Calendar calendar;
     private SClip alarmClockSound;
+    private String code;
 
     
     public Alarma(String AlarmName, String day, int hour, int min) {
         Alarma.count = Alarma.count;
+        Alarma.uniqueCode++;
         this.alarmName = AlarmName;
         this.day = day;
         this.hour = hour;
         this.min = min;
         this.isAlarmOn = true;
         this.alarmClockSound=new SClip("src/sounds/alarmClock.wav");
+        this.code = uniqueCode+alarmName+day+hour+min;
 
     }
     
@@ -84,7 +88,7 @@ public class Alarma implements Runnable{
         }
     }
     public String getCode(){
-        return alarmName+day+hour+min;
+        return code;
     }
     public String getAlarmName(){
         return this.alarmName;
@@ -146,21 +150,22 @@ public class Alarma implements Runnable{
             isAlarmOn=false;  
             count--;
             ListIterator<Thread> itt=Main.aplicacion.alarm_list_thread.listIterator();
-            ListIterator<Alarma> ita=Main.aplicacion.alarm_list.listIterator();
+            ListIterator<Alarma> ita=Componentes.alarm_list.listIterator();
             while(itt.hasNext() && ita.hasNext()){
                 Alarma a=ita.next();
                 Thread t=itt.next();
                 if(!a.isAlarmOn && !a.getCode().equals(this.getCode())){
+                    System.out.println("eliminado el :"+a.getCode());
                     ita.remove();
                     itt.remove();
-                }
+                }else{System.out.println("no se elimino el Thread: "+a.getCode());}
             }
             //menor o igual a uno, porque no se puede eliminar un hilo en ejecucion.
-            if(Main.aplicacion.alarm_list.size()<=1){ 
+            if(Componentes.alarm_list.size()<=1){ 
                 Main.aplicacion.alarmShowListButton.setForeground(Color.decode("#9F6469"));
                 Main.aplicacion.alarmShowListButton.setEnabled(false);
             }
-            Main.aplicacion.list_of_alarms.rebuildGraphicalList();
+            Componentes.list_of_alarms.rebuildGraphicalList();
         }
         
     }

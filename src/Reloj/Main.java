@@ -9,7 +9,6 @@ public class Main {
             aplicacion=new Componentes();
             aplicacion.setVisible(true); 
         }catch(Exception e){
-            System.out.println(e);
         }
     }   
 }

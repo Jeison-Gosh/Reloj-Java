@@ -18,7 +18,7 @@ public class ListaAlarmas extends JFrame {
     
     private int coordinateX=30, coordinateY=10, accountant=0;
     private final LinkedList<AlarmaGrafica> AGList;
-    private boolean wasCalledByRebuildMetod;
+    private boolean wasCalledByRebuildMethod;
     private MensajeDeAyuda Help_Message=null;
     private JLabel exitButton, minimizeButton, backgroundButton;
     private JPanel InputPanel;
@@ -34,7 +34,7 @@ public class ListaAlarmas extends JFrame {
         setBackground(Color.CYAN);
         setUndecorated(true);
         AGList = new LinkedList<>();
-        wasCalledByRebuildMetod=false;
+        wasCalledByRebuildMethod=false;
         
     }
     
@@ -123,20 +123,21 @@ public class ListaAlarmas extends JFrame {
     }
     private void mouseListenerMinimizeButton()  {
         MouseAdapter MA=new MouseAdapter() {
+                 @Override
                  public void mouseEntered(MouseEvent me) {
                     minimizeButton.setForeground(Color.decode("#EDEBE6"));
-
                 }
 
                 @Override
                 public void mouseExited(MouseEvent me) {
                     minimizeButton.setForeground(Color.decode("#efb810"));  
                 }
-            };
+        };
         minimizeButton.addMouseListener(MA);
     }
     private void mouseListenerBackgroundButton() {
         MouseAdapter MA=new MouseAdapter() {
+             @Override
              public void mouseEntered(MouseEvent me) {
                 backgroundButton.setForeground(Color.decode("#EDEBE6"));
                 
@@ -153,29 +154,15 @@ public class ListaAlarmas extends JFrame {
     public void addAlarm(AlarmaGrafica AG){
         AG.setLocation(coordinateX,coordinateY);
         switch(AG.getDay()){
-            case "Domingo":
-                AG.setBackground(Color.decode("#610404"));
-                break;
-            case "Lunes":
-                AG.setBackground(Color.decode("#5C6104"));
-                break;
-            case "Martes":
-                AG.setBackground(Color.decode("#046122"));
-                break;
-            case "Miercoles":
-                AG.setBackground(Color.decode("#045F61"));
-                break;
-            case "Jueves":
-              AG.setBackground(Color.decode("#041161"));
-                break;
-            case "Viernes":
-                AG.setBackground(Color.decode("#250461"));
-                break;
-            case "Sabado":
-                AG.setBackground(Color.decode("#61045B"));
-                break;
+            case "Domingo" -> AG.setBackground(Color.decode("#610404"));
+            case "Lunes" -> AG.setBackground(Color.decode("#5C6104"));
+            case "Martes" -> AG.setBackground(Color.decode("#046122"));
+            case "Miercoles" -> AG.setBackground(Color.decode("#045F61"));
+            case "Jueves" -> AG.setBackground(Color.decode("#041161"));
+            case "Viernes" -> AG.setBackground(Color.decode("#250461"));
+            case "Sabado" -> AG.setBackground(Color.decode("#61045B"));
         }
-        if(!wasCalledByRebuildMetod){
+        if(!wasCalledByRebuildMethod){
             if(AGList.isEmpty()){
                 AGList.addFirst(AG);
             }else{
@@ -188,7 +175,7 @@ public class ListaAlarmas extends JFrame {
         InputPanel.add(AG);
     }
     public synchronized void rebuildGraphicalList(){
-        ListIterator<Alarma> ita=Main.aplicacion.alarm_list.listIterator();
+        ListIterator<Alarma> ita=Componentes.alarm_list.listIterator();
         ListIterator<AlarmaGrafica> itag=AGList.listIterator();
         while(ita.hasNext() && itag.hasNext()){
             Alarma a=ita.next();
@@ -203,10 +190,10 @@ public class ListaAlarmas extends JFrame {
         Background_Button();
         coordinateY=10;
         for(AlarmaGrafica ag: AGList){
-            wasCalledByRebuildMetod=true;
+            wasCalledByRebuildMethod=true;
             addAlarm(ag);
         }
-        wasCalledByRebuildMetod=false;
+        wasCalledByRebuildMethod=false;
         if(this.isVisible()){
             this.setVisible(false);
             this.setVisible(true);
